@@ -7,6 +7,8 @@ services:
       context: .
     ports:
       - "{{cookiecutter.api_port}}:{{cookiecutter.api_port}}"
+    networks:
+      - development
     volumes:
       - .:/home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}
       - /home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.egg-info
@@ -22,6 +24,8 @@ services:
     image: postgres:13
     ports:
       - "{{cookiecutter.db_port}}:5432"
+    networks:
+      - development
     environment:
       - POSTGRES_USER={{cookiecutter.project_slug}}
       - POSTGRES_PASSWORD=testing123
@@ -31,10 +35,16 @@ services:
     image: redis:6
     ports:
       - "{{cookiecutter.cache_port}}:6379"
+    networks:
+      - development
   api-docs:
     container_name: {{cookiecutter.project_slug}}-api-docs
     image: swaggerapi/swagger-ui
     ports:
       - "{{cookiecutter.api_docs_port}}:8080"
+    networks:
+      - development
     environment:
       API_URL: http://localhost:3141/openapi 
+networks:
+  development:

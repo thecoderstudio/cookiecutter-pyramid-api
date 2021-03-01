@@ -8,6 +8,8 @@ services:
     volumes:
       - .:/home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}
       - /home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.egg-info
+    networks:
+      - testing
     tty: true
     stdin_open: true
     entrypoint: "/bin/bash"
@@ -19,6 +21,8 @@ services:
     image: postgres:13
     ports:
       - "{{cookiecutter.test_db_port}}:5432"
+    networks:
+      - testing
     environment:
       - POSTGRES_USER={{cookiecutter.project_slug}}
       - POSTGRES_PASSWORD=testing123
@@ -28,3 +32,7 @@ services:
     image: redis:6
     ports:
       - "{{cookiecutter.test_cache_port}}:6379"
+    networks:
+      - testing
+networks:
+  testing:
