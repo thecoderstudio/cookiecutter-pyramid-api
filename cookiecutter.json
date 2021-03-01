@@ -1,0 +1,23 @@
+{
+  "author": "Robin Siep",
+  "author_email": "hello@robinsiep.dev",
+  "project_name": "Pyramid API",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '') }}",
+  "project_description": "API starterpack using the Pyramid framework, includes authentication and authorization.",
+  "version": "0.1.0",
+  "domain": "robinsiep.dev",
+  "sender_email_address": "{{ 'noreply@' + cookiecutter.domain }}",
+  "test_email_address": "{{ 'test@' + cookiecutter.domain }}",
+  "alternative_test_email_address": "{{ 'fake@' + cookiecutter.domain }}",
+  "api_port": "4000",
+  "db_port": "{{ cookiecutter.api_port|int + 1 }}",
+  "cache_port": "{{ cookiecutter.db_port|int + 1 }}",
+  "api_docs_port": "{{ cookiecutter.cache_port|int + 1 }}",
+  "test_db_port": "{{ cookiecutter.api_docs_port|int + 1 }}",
+  "test_cache_port": "{{ cookiecutter.test_db_port|int + 1 }}",
+  "sendgrid_account_recovery_template_id": "",
+  "sendgrid_api_key": "",
+  "session_secret": "",
+  "authentication_policy_secret": "",
+  "development_db_password": ""
+}

@@ -1,0 +1,30 @@
+version: '3'
+services:
+  {{cookiecutter.project_slug}}-test:
+    container_name: {{cookiecutter.project_slug}}-test
+    image: {{cookiecutter.project_slug}}:test
+    build:
+      context: .
+    volumes:
+      - .:/home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}
+      - /home/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}/{{cookiecutter.project_slug}}.egg-info
+    tty: true
+    stdin_open: true
+    entrypoint: "/bin/bash"
+    command: >
+      -c "../util/wait-for-it.sh db-test:5432 &&
+      pytest --cov={{cookiecutter.project_slug}} -q --cov-report term-missing"
+  db-test:
+    container_name: {{cookiecutter.project_slug}}-db-test
+    image: postgres:13
+    ports:
+      - "{{cookiecutter.test_db_port}}:5432"
+    environment:
+      - POSTGRES_USER={{cookiecutter.project_slug}}
+      - POSTGRES_PASSWORD=testing123
+      - POSTGRES_DB={{cookiecutter.project_slug}}
+  cache-test:
+    container_name: {{cookiecutter.project_slug}}-cache-test
+    image: redis:6
+    ports:
+      - "{{cookiecutter.test_cache_port}}:6379"
