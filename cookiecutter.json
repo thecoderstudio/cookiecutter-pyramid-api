@@ -1,11 +1,11 @@
 {
   "author": "Robin Siep",
-  "author_email": "hello@robinsiep.dev",
+  "author_email": "hello@coderstudio.nl",
   "project_name": "Pyramid API",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '') }}",
   "project_description": "API starterpack using the Pyramid framework, includes authentication and authorization.",
   "version": "0.1.0",
-  "domain": "robinsiep.dev",
+  "domain": "coderstudio.nl",
   "sender_email_address": "{{ 'noreply@' + cookiecutter.domain }}",
   "test_email_address": "{{ 'test@' + cookiecutter.domain }}",
   "alternative_test_email_address": "{{ 'fake@' + cookiecutter.domain }}",
