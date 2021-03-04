@@ -8,15 +8,15 @@ from {{cookiecutter.project_slug}}.models.functions import utcnow
 
 
 # revision identifiers, used by Alembic.
-revision = '67b7cdb50818'
-down_revision = '71103838e7b3'
+revision = '0464f1e37cf0'
+down_revision = '67b7cdb50818'
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
     op.create_table(
-        'recovery_token',
+        'verification_token',
         sa.Column('id', UUID(as_uuid=True), nullable=False),
         sa.Column('token_hash', sa.String(119), nullable=False),
         sa.Column('token_salt', sa.String(29), nullable=False),
@@ -26,7 +26,7 @@ def upgrade():
             'expires_on',
             sa.DateTime,
             default=utcnow() + datetime.timedelta(
-                hours=1
+                hours=24
             ),
             nullable=False
         ),
@@ -38,11 +38,7 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.add_column('user',
-                  sa.Column('verified', sa.Boolean, default=False,
-                            nullable=False))
 
 
 def downgrade():
-    op.drop_column('user', 'verified')
-    op.drop_table('recovery_token')
+    op.drop_table('verification_token')
