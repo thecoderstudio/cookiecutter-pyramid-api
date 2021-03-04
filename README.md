@@ -9,6 +9,7 @@ The generated project contains the following implementations so that you can foc
 * [OpenAPI](https://swagger.io/specification/) documentation and decorators to further expand this.
 * Cookie-based authentication using email address and password.
 * Support for account recovery using [Sendgrid](https://sendgrid.com/).
+* Support for account verification using Sendgrid.
 * Authorization management on all handlers.
 * [Dockerfile](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) files for easy development.
 * Full unit test coverage.
