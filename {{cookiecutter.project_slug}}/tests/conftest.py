@@ -93,7 +93,8 @@ def dummy_user():
         email_address='{{cookiecutter.test_email_address}}',
         password_hash=(
             '$2b$12$FdTnxaL.NlRdEHREzbU3k.Nt1Gpii9vrKU.1h/MnZYdlMHPUW8/k.'),
-        password_salt='$2b$12$FdTnxaL.NlRdEHREzbU3k.'
+        password_salt='$2b$12$FdTnxaL.NlRdEHREzbU3k.',
+        verified=False
     )
 
 

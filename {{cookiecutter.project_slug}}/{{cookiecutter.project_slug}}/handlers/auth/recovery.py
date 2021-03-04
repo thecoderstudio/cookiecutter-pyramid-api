@@ -1,6 +1,5 @@
 import random
 import time
-
 from secrets import token_hex
 
 from pyramid.httpexceptions import HTTPCreated
@@ -54,7 +53,7 @@ class AccountRecoveryHandler(LoginHandler):
 
         try:
             recipient = get_one_user_by_email_address(email_address)
-            self._invalidate_any_current_token(recipient)
+            self._invalidate_any_current_recovery_token(recipient)
             self._save_recovery_token(recipient, token)
             SendGridClient().send_account_recovery_email(email_address, token)
         except NoResultFound:
@@ -71,7 +70,7 @@ class AccountRecoveryHandler(LoginHandler):
         ) / 10)
 
     @staticmethod
-    def _invalidate_any_current_token(user):
+    def _invalidate_any_current_recovery_token(user):
         try:
             user.active_recovery_token.invalidate()
         except AttributeError:

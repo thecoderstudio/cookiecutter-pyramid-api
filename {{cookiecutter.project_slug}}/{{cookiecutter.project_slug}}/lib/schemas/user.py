@@ -12,6 +12,7 @@ class UserSchema(Schema):
     email_address = fields.Email(required=True)
     password = fields.Str(required=True, load_only=True,
                           validate=validate.Length(min=MIN_PASSWORD_LENGTH))
+    verified = fields.Bool(dump_only=True)
 
     @validates('email_address')
     def check_if_email_unique(self, value):
@@ -35,6 +36,7 @@ class CreateUserSchema(UserSchema):
 
 class UpdateUserSchema(UserSchema):
     current_password = fields.Str(load_only=True)
+    verification_token = fields.Str(load_only=True)
 
     def __init__(self, user: User = None,
                  requires_current_password: bool = True,
@@ -72,10 +74,48 @@ class UpdateUserSchema(UserSchema):
                 'current_password'
             )
 
+    @validates('verification_token')
+    def validate_verification_token(self, token):
+        context_user = self.context['user']
+        if context_user.verified:
+            raise ValidationError("This user is already verified.")
+
+        verification_token = context_user.active_verification_token
+
+        try:
+            if compare_plaintext_to_hash(token,
+                                         verification_token.token_hash,
+                                         verification_token.token_salt):
+                verification_token.used = True
+                return
+        except AttributeError:
+            # No token, continue to raise
+            pass
+
+        raise ValidationError("The given token is incorrect or expired.")
+
     @post_load
     def hash_password(self, data, **kwargs):
         try:
             return super().hash_password(data)
         except KeyError:
             # No password, which is fine since it's not required.
-            pass
+            return data
+
+    @post_load
+    def set_verified(self, data, **kwargs):
+        if data.pop('verification_token', None):
+            data['verified'] = True
+
+        return data
+
+
+class VerifyUserSchema(Schema):
+    def __init__(self, user: User = None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.context['user'] = user
+
+    @validates_schema
+    def check_if_already_verified(self, data, **kwargs):
+        if self.context['user'].verified:
+            raise ValidationError("This user is already verified.")

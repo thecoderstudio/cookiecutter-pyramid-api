@@ -3,6 +3,7 @@ import uuid
 from pyramid.security import Allow
 
 from {{cookiecutter.project_slug}}.models import save
+from {{cookiecutter.project_slug}}.models.security.verification_token import VerificationToken
 from {{cookiecutter.project_slug}}.models.user import (get_user_by_email_address, get_one_user_by_id,
                                 get_user_by_id, User)
 
@@ -87,5 +88,46 @@ def test_user_acl():
     assert user.__acl__() == (
         (Allow, f"user:{user.id}", 'user.patch'),
         (Allow, f"user:{user.id}", 'user.get'),
+        (Allow, f"user:{user.id}", 'user.request_verification_token'),
         (Allow, f"recovering_user:{user.id}", 'user.reset_password')
     )
+
+
+def test_user_set_fields():
+    verification_token = VerificationToken(
+        token_hash='fake',
+        token_salt='fake'
+    )
+    user = User(
+        id=uuid.uuid4(),
+        email_address="{{cookiecutter.test_email_address}}",
+        password_hash="fake",
+        password_salt="fake",
+        active_verification_token=verification_token
+    )
+    new_email_address = 'fake@robinsiep.dev'
+
+    user.set_fields(email_address=new_email_address, verified=True)
+
+    assert user.email_address == new_email_address
+    assert user.verified
+    assert verification_token.invalidated
+
+
+def test_user_set_verified():
+    verification_token = VerificationToken(
+        token_hash='fake',
+        token_salt='fake'
+    )
+    user = User(
+        id=uuid.uuid4(),
+        email_address="{{cookiecutter.test_email_address}}",
+        password_hash="fake",
+        password_salt="fake",
+        active_verification_token=verification_token
+    )
+
+    user.set_verified()
+
+    assert user.verified
+    assert verification_token.invalidated

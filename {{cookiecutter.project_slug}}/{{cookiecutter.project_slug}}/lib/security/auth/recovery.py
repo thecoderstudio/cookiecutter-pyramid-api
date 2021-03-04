@@ -13,11 +13,10 @@ class AuthWithRecoveryTokenManager(AuthManager):
     def login(self, login_data: dict):
         response = super().login(login_data)
 
-        recovery_token = get_user_by_email_address(
-            login_data['email_address']
-        ).active_recovery_token
-        recovery_token.used = True
-        save(recovery_token)
+        user = get_user_by_email_address(login_data['email_address'])
+        user.active_recovery_token.used = True
+        user.set_verified()
+        save(user)
 
         return response
 

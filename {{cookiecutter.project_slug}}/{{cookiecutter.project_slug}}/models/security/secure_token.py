@@ -1,9 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import and_, Boolean, Column, DateTime, func, not_, String
+from sqlalchemy import (and_, Boolean, Column, DateTime, ForeignKey,
+                        func, not_, String)
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import case
 
 from {{cookiecutter.project_slug}}.models.functions import utcnow
@@ -56,3 +59,14 @@ class SecureTokenMixin:
 
     def invalidate(self):
         self.invalidated = True
+
+
+class SecureUserTokenMixin(SecureTokenMixin):
+    @declared_attr
+    def for_user_id(cls):
+        return Column(UUID(as_uuid=True), ForeignKey('user.id'),
+                      nullable=False)
+
+    @declared_attr
+    def for_user(cls):
+        return relationship('User')

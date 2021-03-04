@@ -1,7 +1,7 @@
 import uuid
 
 from pyramid.security import Allow
-from sqlalchemy import Column, String
+from sqlalchemy import Boolean, Column, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -16,12 +16,19 @@ class User(Base, LocationAwareResource):
     email_address = Column(String(320), unique=True, nullable=False)
     password_hash = Column(String(119), nullable=False)
     password_salt = Column(String(29), nullable=False)
+    verified = Column(Boolean, nullable=False, default=False)
 
     active_recovery_token = relationship(
         'RecoveryToken',
         uselist=False,
         primaryjoin="and_(User.id==RecoveryToken.for_user_id, "
         "RecoveryToken.active==True)"
+    )
+    active_verification_token = relationship(
+        'VerificationToken',
+        uselist=False,
+        primaryjoin="and_(User.id==VerificationToken.for_user_id, "
+        "VerificationToken.active==True)"
     )
 
     def __eq__(self, other):
@@ -34,11 +41,27 @@ class User(Base, LocationAwareResource):
         return not self.__eq__(other)
 
     def __acl__(self):
+        user_principal = f"user:{self.id}"
         return (
-            (Allow, f"user:{self.id}", 'user.patch'),
-            (Allow, f"user:{self.id}", 'user.get'),
+            (Allow, user_principal, 'user.patch'),
+            (Allow, user_principal, 'user.get'),
+            (Allow, user_principal, 'user.request_verification_token'),
             (Allow, f"recovering_user:{self.id}", 'user.reset_password')
         )
+
+    def set_fields(self, **kwargs):
+        if kwargs.get('verified'):
+            kwargs.pop('verified')
+            self.set_verified()
+
+        super().set_fields(**kwargs)
+
+    def set_verified(self):
+        try:
+            self.verified = True
+            self.active_verification_token.invalidate()
+        except AttributeError:
+            pass
 
 
 def _get_user_by_email_address(email_address):

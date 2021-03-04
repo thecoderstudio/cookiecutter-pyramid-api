@@ -45,21 +45,49 @@ class MailMatcher:
     HTTPStatus.INTERNAL_SERVER_ERROR
 ))
 def test_sendgrid_send_account_recovery_email(mocker, result_status_code):
+    assert_send_secure_token_email(
+        mocker,
+        result_status_code,
+        'account_recovery_template_id',
+        'send_account_recovery_email'
+    )
+
+
+@pytest.mark.parametrize('result_status_code', (
+    HTTPStatus.CREATED,
+    HTTPStatus.INTERNAL_SERVER_ERROR
+))
+def test_sendgrid_send_account_verification_email(mocker, result_status_code):
+    assert_send_secure_token_email(
+        mocker,
+        result_status_code,
+        'account_verification_template_id',
+        'send_account_verification_email'
+    )
+
+
+def assert_send_secure_token_email(
+    mocker,
+    result_status_code,
+    expected_template_id_key,
+    send_method
+):
     sender_email_address = '{{cookiecutter.test_email_address}}'
     recipient_email_address = '{{cookiecutter.alternative_test_email_address}}'
-    template_id = 'templateid'
     token = '123456'
 
     expected_result = False
     if result_status_code == HTTPStatus.CREATED:
         expected_result = True
 
+    sendgrid_settings = {
+        'sender_email_address': sender_email_address,
+        'api_key': 'fake',
+        'account_recovery_template_id': 'fake',
+        'account_verification_template_id': 'fake'
+    }
     mocker.patch('{{cookiecutter.project_slug}}.lib.middleware.sendgrid.settings', {
-        'sendgrid': {
-            'sender_email_address': sender_email_address,
-            'api_key': 'fake',
-            'account_recovery_template_id': template_id
-        }
+        'sendgrid': sendgrid_settings
     })
 
     response_mock = mocker.MagicMock()
@@ -69,7 +97,7 @@ def test_sendgrid_send_account_recovery_email(mocker, result_status_code):
         return_value=response_mock
     )
 
-    result = SendGridClient().send_account_recovery_email(
+    result = getattr(SendGridClient(), send_method)(
         recipient_email_address,
         token
     )
@@ -78,6 +106,6 @@ def test_sendgrid_send_account_recovery_email(mocker, result_status_code):
     send_mock.assert_called_with(MailMatcher(
         sender_email_address,
         recipient_email_address,
-        template_id,
+        sendgrid_settings[expected_template_id_key],
         token
     ))
