@@ -25,5 +25,5 @@ pip install -U cookiecutter
 
 Generate the project:
 ```
-cookiecutter https://github.com/RobinSiep/cookiecutter-pyramid-api.git
+cookiecutter https://github.com/thecoderstudio/cookiecutter-pyramid-api.git
 ```
