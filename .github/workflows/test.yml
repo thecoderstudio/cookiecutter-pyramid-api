@@ -20,7 +20,7 @@ jobs:
 
       - name: Generate sample project
         env:
-          PATH=$HOME/.local/bin:$PATH
+          PATH: $HOME/.local/bin:$PATH
         run: cookiecutter --no-input .
 
       - name: Test with pytest
