@@ -18,7 +18,7 @@ jobs:
       - name: Install Cookiecutter
         run: |
           pip install --user cookiecutter
-          sudo chmod +x /root/.local/bin/cookiecutter
+          sudo chmod +x ~/.local/bin/cookiecutter
 
       - name: Generate sample project
         run: /root/.local/bin/cookiecutter --no-input .
