@@ -20,7 +20,7 @@ services:
     entrypoint: "/bin/bash"
     command: >
       -c "../util/wait-for-it.sh db-test:5432 &&
-      pytest --cov={{cookiecutter.project_slug}} -q --cov-report term-missing --cover-report xml"
+      pytest --cov={{cookiecutter.project_slug}} -q --cov-report term-missing --cov-report xml"
   db-test:
     container_name: {{cookiecutter.project_slug}}-db-test
     image: postgres:13
