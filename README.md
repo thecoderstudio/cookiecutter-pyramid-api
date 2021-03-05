@@ -1,6 +1,6 @@
 # Pyramid API Starter
-![](https://github.com/RobinSiep/cookiecutter-pyramid-api/workflows/Test/badge.svg)
-[![codecov](https://codecov.io/gh/RobinSiep/cookiecutter-pyramid-api/branch/master/graph/badge.svg?token=PP7DQ89YCI)](https://codecov.io/gh/RobinSiep/cookiecutter-pyramid-api)
+![](https://github.com/thecoderstudio/cookiecutter-pyramid-api/workflows/Test/badge.svg)
+[![codecov](https://codecov.io/gh/thecoderstudio/cookiecutter-pyramid-api/branch/master/graph/badge.svg?token=MI0RLI024F)](https://codecov.io/gh/thecoderstudio/cookiecutter-pyramid-api)
 
 This [Cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/README.html) template generates an opinionated API project using [Pyramid](https://trypyramid.com/) that's ready for development.
 
