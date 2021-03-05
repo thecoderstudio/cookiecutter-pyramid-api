@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Cookiecutter
-        run: pip install --user cookiecutter
+        run: |
+          pip install --user cookiecutter
+          chmod +x /root/.local/bin/cookiecutter
 
       - name: Generate sample project
         run: /root/.local/bin/cookiecutter --no-input .
