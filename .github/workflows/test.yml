@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Cookiecutter
+        run:  pip install --user cookiecutter
+
+      - name: Generate sample project
+        run: ~/.local/bin/cookiecutter --no-input .
+
+      - name: Test with pytest
+        run: |
+          cd pyramidapi
+          docker-compose -f test-compose.yml up --exit-code-from pyramidapi-test pyramidapi-test
+
+      - name: Upload coverage report
+        run: bash <(curl -s https://codecov.io/bash)
