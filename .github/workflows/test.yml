@@ -21,7 +21,7 @@ jobs:
           sudo chmod +x ~/.local/bin/cookiecutter
 
       - name: Generate sample project
-        run: /root/.local/bin/cookiecutter --no-input .
+        run: ~/.local/bin/cookiecutter --no-input .
 
       - name: Test with pytest
         run: |
