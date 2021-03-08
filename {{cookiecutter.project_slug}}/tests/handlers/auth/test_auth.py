@@ -74,7 +74,7 @@ def test_logout_success(test_app_with_authenticated_user_id):
     assert 'auth_tkt=;' in response.headers['Set-Cookie']
 
 
-def test_logout_forbidden(test_app):
+def test_logout_unauthorized(test_app):
     response = test_app.post('/auth/logout', expect_errors=True)
 
-    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.status_code == HTTPStatus.UNAUTHORIZED

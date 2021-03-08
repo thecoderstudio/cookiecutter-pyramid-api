@@ -6,6 +6,29 @@ from {{cookiecutter.project_slug}} import VERSION
 from {{cookiecutter.project_slug}}.lib.openapi import OPENAPI_VERSION
 from tests.lib.openapi import SampleSchema
 
+security_schemas = {
+    'Unauthorized': {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'enum': ['Unauthorized'],
+                'readOnly': True
+            }
+        }
+    },
+    'Forbidden': {
+        'type': 'object',
+        'properties': {
+            'message': {
+                'type': 'string',
+                'enum': ['Forbidden'],
+                'readOnly': True
+            }
+        }
+    }
+}
+
 
 @pytest.mark.parametrize('request_method', ('GET', 'POST', 'PUT', 'PATCH',
                                             'DELETE'))
@@ -28,14 +51,23 @@ def test_register_minimal_handler(clean_api_spec, request_method):
                 'tags': [],
                 'responses': {
                     str(int(expected_status_code)): {},
-                    str(int(HTTPStatus.FORBIDDEN)): {}
+                    str(int(HTTPStatus.UNAUTHORIZED)): {
+                        'content': {'application/json': {'schema': {
+                            '$ref': '#/components/schemas/Unauthorized'
+                        }}}
+                    },
+                    str(int(HTTPStatus.FORBIDDEN)): {
+                        'content': {'application/json': {'schema': {
+                            '$ref': '#/components/schemas/Forbidden'
+                        }}}
+                    }
                 },
                 'security': {
                     'auth_tkt': []
                 }
             }
         }
-    })
+    }, schemas=security_schemas)
 
 
 def test_register_full_handler(clean_api_spec):
