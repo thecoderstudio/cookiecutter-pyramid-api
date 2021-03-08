@@ -1,4 +1,7 @@
+from http import HTTPStatus
+
 from {{cookiecutter.project_slug}}.lib.openapi.operation import OperationSpec
+from {{cookiecutter.project_slug}}.lib.schemas.response import ForbiddenSchema, UnauthorizedSchema
 from tests.lib.openapi import SampleSchema
 
 
@@ -6,14 +9,14 @@ def test_build_minimal_operation_spec():
     spec = OperationSpec(
         request_schema_class=None,
         response_schema_class=None,
-        successful_response_code=200,
+        successful_response_code=HTTPStatus.OK,
         tags=[],
         public=True
     )
 
     assert spec.to_dict() == {
         'responses': {
-            200: {}
+            HTTPStatus.OK: {}
         },
         'tags': [],
         'security': []
@@ -25,7 +28,7 @@ def test_build_full_operation_spec():
     spec = OperationSpec(
         request_schema_class=schema_class,
         response_schema_class=schema_class,
-        successful_response_code=201,
+        successful_response_code=HTTPStatus.CREATED,
         tags=['sample'],
         public=False
     )
@@ -34,15 +37,22 @@ def test_build_full_operation_spec():
         'tags': ['sample'],
         'security': {'auth_tkt': []},
         'responses': {
-            201: {
-                'content': {
-                    'application/json': {
-                        'schema': schema_class
-                    }
-                }
+            HTTPStatus.BAD_REQUEST: {},
+            HTTPStatus.CREATED: {
+                'content': {'application/json': {
+                    'schema': schema_class
+                }}
             },
-            400: {},
-            403: {}
+            HTTPStatus.UNAUTHORIZED: {
+                'content': {'application/json': {
+                    'schema': UnauthorizedSchema
+                }}
+            },
+            HTTPStatus.FORBIDDEN: {
+                'content': {'application/json': {
+                    'schema': ForbiddenSchema
+                }}
+            }
         },
         'requestBody': {
             'content': {

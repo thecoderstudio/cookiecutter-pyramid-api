@@ -3,6 +3,8 @@ from typing import Optional, Type
 
 from marshmallow import Schema
 
+from {{cookiecutter.project_slug}}.lib.schemas.response import ForbiddenSchema, UnauthorizedSchema
+
 
 class OperationSpec:
     def __init__(
@@ -42,18 +44,13 @@ class OperationSpec:
     def _add_successful_response(
         self,
         successful_response_code: int,
-        response_schema_class
+        response_schema_class: Type[Schema]
     ):
         successful_response_body = {}
 
         if response_schema_class:
-            successful_response_body = {
-                'content': {
-                    'application/json': {
-                        'schema': response_schema_class
-                    }
-                }
-            }
+            successful_response_body = self._build_response_content(
+                response_schema_class)
 
         self.__dict__['responses'][successful_response_code] = (
             successful_response_body)
@@ -61,9 +58,24 @@ class OperationSpec:
     def _add_security(self, public: bool):
         if not public:
             self.__dict__['security'] = {'auth_tkt': []}
-            self.__dict__['responses'][HTTPStatus.FORBIDDEN] = {}
+            self.__dict__['responses'].update({
+                HTTPStatus.FORBIDDEN: self._build_response_content(
+                    ForbiddenSchema),
+                HTTPStatus.UNAUTHORIZED: self._build_response_content(
+                    UnauthorizedSchema)
+            })
         else:
             self.__dict__['security'] = []
+
+    @staticmethod
+    def _build_response_content(schema_class: Type[Schema]):
+        return {
+            'content': {
+                'application/json': {
+                    'schema': schema_class
+                }
+            }
+        }
 
     def to_dict(self):
         return self.__dict__

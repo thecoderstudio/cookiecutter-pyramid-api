@@ -29,7 +29,16 @@ def test_view_config(clean_api_spec):
                     'tags': [],
                     'responses': {
                         str(int(HTTPStatus.CREATED)): {},
-                        str(int(HTTPStatus.FORBIDDEN)): {}
+                        str(int(HTTPStatus.UNAUTHORIZED)): {
+                            'content': {'application/json': {'schema': {
+                                '$ref': '#/components/schemas/Unauthorized'
+                            }}}
+                        },
+                        str(int(HTTPStatus.FORBIDDEN)): {
+                            'content': {'application/json': {'schema': {
+                                '$ref': '#/components/schemas/Forbidden'
+                            }}}
+                        }
                     },
                     'security': {
                         'auth_tkt': []
@@ -48,6 +57,28 @@ def test_view_config(clean_api_spec):
                     'type': 'apiKey',
                     'name': 'auth_tkt',
                     'in': 'cookie'
+                }
+            },
+            'schemas': {
+                'Unauthorized': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {
+                            'type': 'string',
+                            'enum': ['Unauthorized'],
+                            'readOnly': True
+                        }
+                    }
+                },
+                'Forbidden': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {
+                            'type': 'string',
+                            'enum': ['Forbidden'],
+                            'readOnly': True
+                        }
+                    }
                 }
             }
         }
