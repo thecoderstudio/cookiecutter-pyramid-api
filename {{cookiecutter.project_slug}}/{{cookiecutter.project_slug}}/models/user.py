@@ -54,6 +54,7 @@ class User(Base, LocationAwareResource):
     def __acl__(self):
         user_principal = f"user:{self.id}"
         return (
+            (Allow, user_principal, 'user.delete'),
             (Allow, user_principal, 'user.get'),
             (Allow, user_principal, 'user.patch'),
             (Allow, user_principal, 'user.request_verification_token'),

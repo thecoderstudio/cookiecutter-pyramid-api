@@ -1,6 +1,7 @@
+import uuid
 from secrets import token_hex
 
-from pyramid.httpexceptions import HTTPCreated
+from pyramid.httpexceptions import HTTPCreated, HTTPNoContent
 from pyramid.view import view_defaults
 
 from {{cookiecutter.project_slug}}.handlers import Handler, view_config
@@ -11,7 +12,8 @@ from {{cookiecutter.project_slug}}.lib.middleware.sendgrid import SendGridClient
 from {{cookiecutter.project_slug}}.lib.schemas import validate
 from {{cookiecutter.project_slug}}.lib.schemas.user import (CreateUserSchema, UpdateUserSchema,
                                      UserSchema, VerifyUserSchema)
-from {{cookiecutter.project_slug}}.models import save
+from {{cookiecutter.project_slug}}.lib.security.auth import AuthWithPasswordManager
+from {{cookiecutter.project_slug}}.models import delete,  save
 from {{cookiecutter.project_slug}}.models.security.verification_token import VerificationToken
 from {{cookiecutter.project_slug}}.models.user import User
 
@@ -92,6 +94,22 @@ class UserHandler(Handler):
     )
     def get(self):
         return UserSchema().dump(self.context)
+
+    @view_config(
+        path_hints=['user/me'],
+        permission='user.delete',
+        request_method='DELETE',
+        tags='user',
+        context=User
+    )
+    def delete(self):
+        user_id = self.context.id
+        delete(self.context)
+
+        if user_id == uuid.UUID(self.request.authenticated_userid):
+            return AuthWithPasswordManager(self.request).logout()
+
+        raise HTTPNoContent
 
     @view_config(
         path_hints=['/user/me/request-verification-token'],
