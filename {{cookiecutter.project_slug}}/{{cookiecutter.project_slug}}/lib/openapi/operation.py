@@ -3,7 +3,10 @@ from typing import Optional, Type
 
 from marshmallow import Schema
 
-from {{cookiecutter.project_slug}}.lib.schemas.response import ForbiddenSchema, UnauthorizedSchema
+from {{cookiecutter.project_slug}}.lib.schemas.response import (
+    CreatedSchema, ForbiddenSchema, InternalServerErrorSchema,
+    NotFoundSchema, OKSchema, UnauthorizedSchema
+)
 
 
 class OperationSpec:
@@ -13,7 +16,8 @@ class OperationSpec:
         response_schema_class: Optional[Type[Schema]],
         successful_response_code: int,
         tags: list[str],
-        public: bool
+        public: bool,
+        not_found_possible: bool
     ):
         self.__dict__ = {
             'responses': {}
@@ -21,6 +25,7 @@ class OperationSpec:
 
         self._add_tags(tags)
         self._add_request(request_schema_class)
+        self._add_unsuccessful_responses(not_found_possible)
         self._add_successful_response(successful_response_code,
                                       response_schema_class)
         self._add_security(public)
@@ -41,6 +46,14 @@ class OperationSpec:
         }
         self.__dict__['responses'][HTTPStatus.BAD_REQUEST] = {}
 
+    def _add_unsuccessful_responses(self, not_found_possible: bool):
+        self.__dict__['responses'][HTTPStatus.INTERNAL_SERVER_ERROR] = (
+            self._build_response_content(InternalServerErrorSchema))
+
+        if not_found_possible:
+            self.__dict__['responses'][HTTPStatus.NOT_FOUND] = (
+                self._build_response_content(NotFoundSchema))
+
     def _add_successful_response(
         self,
         successful_response_code: int,
@@ -51,6 +64,13 @@ class OperationSpec:
         if response_schema_class:
             successful_response_body = self._build_response_content(
                 response_schema_class)
+        else:
+            if successful_response_code == HTTPStatus.OK:
+                successful_response_body = self._build_response_content(
+                    OKSchema)
+            elif successful_response_code == HTTPStatus.CREATED:
+                successful_response_body = self._build_response_content(
+                    CreatedSchema)
 
         self.__dict__['responses'][successful_response_code] = (
             successful_response_body)

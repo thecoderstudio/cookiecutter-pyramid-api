@@ -69,4 +69,4 @@ class SecureUserTokenMixin(SecureTokenMixin):
 
     @declared_attr
     def for_user(cls):
-        return relationship('User')
+        return relationship('User', back_populates=cls.user_relationship_name)

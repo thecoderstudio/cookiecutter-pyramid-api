@@ -1,7 +1,9 @@
 from typing import Type, Union
 
 from marshmallow import Schema
+from pyramid.httpexceptions import HTTPOk
 from pyramid.view import view_config as pyramid_view_config
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
 
 from {{cookiecutter.project_slug}}.lib.openapi import APISpec
 
@@ -10,6 +12,7 @@ class Handler:
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        request.response = HTTPOk()
 
 
 class view_config(pyramid_view_config):
@@ -25,8 +28,12 @@ class view_config(pyramid_view_config):
         *args,
         **kwargs
     ):
-        super().__init__(request_method=request_method, renderer='json',
-                         *args, **kwargs)
+        super().__init__(
+            request_method=request_method,
+            renderer='json',
+            *args, **kwargs
+        )
+
         APISpec.register_handler(
             path_hints,
             request_method,
@@ -34,5 +41,9 @@ class view_config(pyramid_view_config):
             response_schema_class,
             successful_response_code,
             tags,
-            public_hint
+            public_hint,
+            not_found_possible=isinstance(
+                kwargs.get('context'),
+                DeclarativeMeta
+            )
         )

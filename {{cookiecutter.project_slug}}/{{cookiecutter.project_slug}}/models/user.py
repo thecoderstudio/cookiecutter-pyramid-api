@@ -18,6 +18,17 @@ class User(Base, LocationAwareResource):
     password_salt = Column(String(29), nullable=False)
     verified = Column(Boolean, nullable=False, default=False)
 
+    recovery_tokens = relationship(
+        'RecoveryToken',
+        uselist=True,
+        cascade="all, delete-orphan"
+    )
+    verification_tokens = relationship(
+        'VerificationToken',
+        uselist=True,
+        cascade="all, delete-orphan"
+    )
+
     active_recovery_token = relationship(
         'RecoveryToken',
         uselist=False,
@@ -43,8 +54,8 @@ class User(Base, LocationAwareResource):
     def __acl__(self):
         user_principal = f"user:{self.id}"
         return (
-            (Allow, user_principal, 'user.patch'),
             (Allow, user_principal, 'user.get'),
+            (Allow, user_principal, 'user.patch'),
             (Allow, user_principal, 'user.request_verification_token'),
             (Allow, f"recovering_user:{self.id}", 'user.reset_password')
         )

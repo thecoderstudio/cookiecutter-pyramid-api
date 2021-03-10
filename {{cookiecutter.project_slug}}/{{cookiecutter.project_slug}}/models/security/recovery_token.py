@@ -4,6 +4,7 @@ from {{cookiecutter.project_slug}}.models.security.secure_token import SecureUse
 
 class RecoveryToken(Base, SecureUserTokenMixin):
     __tablename__ = 'recovery_token'
+    user_relationship_name = 'recovery_tokens'
 
 
 def get_recovery_token_by_id(id_):

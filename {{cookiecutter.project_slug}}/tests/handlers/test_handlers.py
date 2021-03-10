@@ -28,7 +28,11 @@ def test_view_config(clean_api_spec):
                 'post': {
                     'tags': [],
                     'responses': {
-                        str(int(HTTPStatus.CREATED)): {},
+                        str(int(HTTPStatus.CREATED)): {
+                            'content': {'application/json': {'schema': {
+                                '$ref': '#/components/schemas/Created'
+                            }}}
+                        },
                         str(int(HTTPStatus.UNAUTHORIZED)): {
                             'content': {'application/json': {'schema': {
                                 '$ref': '#/components/schemas/Unauthorized'
@@ -37,6 +41,12 @@ def test_view_config(clean_api_spec):
                         str(int(HTTPStatus.FORBIDDEN)): {
                             'content': {'application/json': {'schema': {
                                 '$ref': '#/components/schemas/Forbidden'
+                            }}}
+                        },
+                        str(int(HTTPStatus.INTERNAL_SERVER_ERROR)): {
+                            'content': {'application/json': {'schema': {
+                                '$ref': (
+                                    '#/components/schemas/InternalServerError')
                             }}}
                         }
                     },
@@ -76,6 +86,26 @@ def test_view_config(clean_api_spec):
                         'message': {
                             'type': 'string',
                             'enum': ['Forbidden'],
+                            'readOnly': True
+                        }
+                    }
+                },
+                'Created': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {
+                            'type': 'string',
+                            'enum': ["Resource created"],
+                            'readOnly': True
+                        }
+                    }
+                },
+                'InternalServerError': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {
+                            'type': 'string',
+                            'enum': ["Something went wrong on our end"],
                             'readOnly': True
                         }
                     }

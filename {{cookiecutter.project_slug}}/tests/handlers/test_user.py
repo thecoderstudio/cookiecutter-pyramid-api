@@ -280,7 +280,7 @@ def test_get_user(test_app_with_authenticated_user_id):
     test_app, user_id = test_app_with_authenticated_user_id
     user = get_user_by_id(user_id)
 
-    response = test_app.get('/user/me', expect_errors=True)
+    response = test_app.get('/user/me')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json == {
@@ -316,7 +316,7 @@ def test_request_verification_token_success(
         expect_errors=True
     )
 
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == HTTPStatus.CREATED
     sendgrid_mock.send_account_verification_email.assert_called_with(
         email_address,
         token_hex_mock()
