@@ -80,6 +80,7 @@ class UserHandler(Handler):
             user.active_recovery_token.invalidate()
 
         save(user)
+        raise self.request.response
 
     @view_config(
         response_schema_class=UserSchema,
@@ -108,6 +109,7 @@ class UserHandler(Handler):
         self.context.active_verification_token = self._send_verification_token(
             self.context)
         save(self.context)
+        raise HTTPCreated
 
     @staticmethod
     def _invalidate_any_current_verification_token(user):

@@ -29,7 +29,8 @@ class AuthHandler(LoginHandler):
         public_hint=True
     )
     def login(self, login_data):
-        return self.auth_manager.login(login_data)
+        self.auth_manager.login(login_data)
+        raise self.request.response
 
     @view_config(
         path_hints=['/auth/logout'],
@@ -40,4 +41,5 @@ class AuthHandler(LoginHandler):
         name='logout'
     )
     def logout(self):
-        return self.auth_manager.logout()
+        self.auth_manager.logout()
+        raise self.request.response

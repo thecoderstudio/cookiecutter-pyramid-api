@@ -44,6 +44,7 @@ class APISpec:
         successful_response_code: int = None,
         tags: Union[str, list[str]] = [],
         public: bool = False,
+        not_found_possible: bool = False
     ):
         tags = APISpec._parse_tags(tags)
         successful_response_code = APISpec._get_response_code_or_default(
@@ -56,7 +57,8 @@ class APISpec:
             response_schema_class,
             successful_response_code,
             tags,
-            public
+            public,
+            not_found_possible
         )
 
         for path in paths:

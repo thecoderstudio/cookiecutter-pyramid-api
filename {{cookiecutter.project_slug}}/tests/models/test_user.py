@@ -86,8 +86,8 @@ def test_user_acl():
     )
 
     assert user.__acl__() == (
-        (Allow, f"user:{user.id}", 'user.patch'),
         (Allow, f"user:{user.id}", 'user.get'),
+        (Allow, f"user:{user.id}", 'user.patch'),
         (Allow, f"user:{user.id}", 'user.request_verification_token'),
         (Allow, f"recovering_user:{user.id}", 'user.reset_password')
     )

@@ -11,6 +11,7 @@ NUMBER_OF_HOURS_VALID = 24
 
 class VerificationToken(Base, SecureUserTokenMixin):
     __tablename__ = 'verification_token'
+    user_relationship_name = 'verification_tokens'
 
     expires_on = Column(
         DateTime,

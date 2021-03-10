@@ -98,4 +98,5 @@ class AccountRecoveryHandler(LoginHandler):
         public_hint=True
     )
     def login(self, login_data):
-        return self.auth_manager.login(login_data)
+        self.auth_manager.login(login_data)
+        raise self.request.response

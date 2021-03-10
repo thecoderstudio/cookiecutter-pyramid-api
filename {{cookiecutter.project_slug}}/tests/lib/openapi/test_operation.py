@@ -1,7 +1,10 @@
 from http import HTTPStatus
 
 from {{cookiecutter.project_slug}}.lib.openapi.operation import OperationSpec
-from {{cookiecutter.project_slug}}.lib.schemas.response import ForbiddenSchema, UnauthorizedSchema
+from {{cookiecutter.project_slug}}.lib.schemas.response import (
+    ForbiddenSchema, InternalServerErrorSchema, NotFoundSchema, OKSchema,
+    UnauthorizedSchema
+)
 from tests.lib.openapi import SampleSchema
 
 
@@ -11,12 +14,22 @@ def test_build_minimal_operation_spec():
         response_schema_class=None,
         successful_response_code=HTTPStatus.OK,
         tags=[],
-        public=True
+        public=True,
+        not_found_possible=False
     )
 
     assert spec.to_dict() == {
         'responses': {
-            HTTPStatus.OK: {}
+            HTTPStatus.OK: {
+                'content': {'application/json': {
+                    'schema': OKSchema
+                }}
+            },
+            HTTPStatus.INTERNAL_SERVER_ERROR: {
+                'content': {'application/json': {
+                    'schema': InternalServerErrorSchema
+                }}
+            }
         },
         'tags': [],
         'security': []
@@ -30,7 +43,8 @@ def test_build_full_operation_spec():
         response_schema_class=schema_class,
         successful_response_code=HTTPStatus.CREATED,
         tags=['sample'],
-        public=False
+        public=False,
+        not_found_possible=True
     )
 
     assert spec.to_dict() == {
@@ -51,6 +65,16 @@ def test_build_full_operation_spec():
             HTTPStatus.FORBIDDEN: {
                 'content': {'application/json': {
                     'schema': ForbiddenSchema
+                }}
+            },
+            HTTPStatus.INTERNAL_SERVER_ERROR: {
+                'content': {'application/json': {
+                    'schema': InternalServerErrorSchema
+                }}
+            },
+            HTTPStatus.NOT_FOUND: {
+                'content': {'application/json': {
+                    'schema': NotFoundSchema
                 }}
             }
         },
