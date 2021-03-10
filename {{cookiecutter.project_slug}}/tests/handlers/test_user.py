@@ -1,5 +1,11 @@
+import uuid
 from http import HTTPStatus
+from unittest.mock import Mock, PropertyMock
 
+import pytest
+from pyramid.httpexceptions import HTTPNoContent
+
+from {{cookiecutter.project_slug}}.handlers.user import UserHandler
 from {{cookiecutter.project_slug}}.lib.hash import compare_plaintext_to_hash, hash_plaintext
 from {{cookiecutter.project_slug}}.models import save
 from {{cookiecutter.project_slug}}.models.security.recovery_token import RecoveryToken
@@ -292,6 +298,40 @@ def test_get_user(test_app_with_authenticated_user_id):
 
 def test_get_user_unauthenticated(test_app):
     response = test_app.get('/user/me', expect_errors=True)
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_delete_user(test_app_with_authenticated_user_id):
+    test_app, user_id = test_app_with_authenticated_user_id
+
+    response = test_app.delete('/user/me')
+
+    assert response.status_code == HTTPStatus.OK
+    assert get_user_by_id(user_id) is None
+
+    # Assert whether session was ended
+    assert 'auth_tkt=;' in response.headers['Set-Cookie']
+
+
+def test_delete_other_user(dummy_user):
+    # No integration test possible because the application flow currently
+    # doesn't allow for this scenario to occur.
+    _, user_id = save(dummy_user)
+    mock_request = Mock()
+    type(mock_request).authenticated_userid = PropertyMock(
+        return_value=str(uuid.uuid4()))
+
+    user_handler = UserHandler(get_user_by_id(user_id), mock_request)
+
+    with pytest.raises(HTTPNoContent):
+        user_handler.delete()
+
+    assert get_user_by_id(user_id) is None
+
+
+def test_delete_user_unauthenticated(test_app):
+    response = test_app.delete('/user/me', expect_errors=True)
 
     assert response.status_code == HTTPStatus.NOT_FOUND
 
